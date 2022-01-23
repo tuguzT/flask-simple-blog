@@ -4,7 +4,7 @@ from flask import render_template, abort, redirect, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 
 from . import app
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm
 from .repository import db
 from .repository.model import Session, User
 
@@ -24,14 +24,15 @@ def index():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
+
     form = LoginForm()
     if form.validate_on_submit():
         user: User = User.query.filter_by(name=form.username.data).one_or_none()
         if user is None:
-            flash('User with provided username does not exist!')
+            flash('User with provided username does not exist')
             return redirect(url_for('login'))
         if not user.check_password(form.password.data):
-            flash('Invalid password for the user with provided username!')
+            flash('Invalid password for the user with provided username')
             return redirect(url_for('login'))
 
         session: Session = Session.query.with_parent(user).one_or_none()
@@ -45,7 +46,25 @@ def login():
         if not next_page or not is_safe_url(next_page):
             next_page = url_for('index')
         return redirect(next_page)
+
     return render_template('login.html', title='Sign in', form=form)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+    form = RegisterForm()
+    if form.validate_on_submit():
+        # noinspection PyArgumentList
+        user: User = User(name=form.username.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('login'))
+
+    return render_template('register.html', title='Register', form=form)
 
 
 @app.route('/logout')
