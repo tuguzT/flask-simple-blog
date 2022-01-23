@@ -1,56 +1,11 @@
-from urllib.parse import urljoin, urlparse
-
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 
-from . import app
-from .forms import LoginForm, RegisterForm, AddPostForm
-from .repository import db
-from .repository.model import Session, User, Post, DeletedPosts
-
-
-def is_safe_url(target):
-    ref_url = urlparse(request.host_url)
-    test_url = urlparse(urljoin(request.host_url, target))
-    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
-
-
-# noinspection PyShadowingNames
-@app.route('/')
-def index():
-    user: User = current_user
-    return render_template('index.html', user=user)
-
-
-# noinspection PyShadowingNames
-@app.route('/me')
-@login_required
-def me():
-    user: User = current_user
-    return render_template('user.html', title=user.name, user=user)
-
-
-# noinspection PyShadowingNames
-@app.route('/user/<name>')
-def user(name: str):
-    user: User = User.query.filter_by(name=name).first_or_404(description=f'No user with username {name}')
-    return render_template('user.html', title=user.name, user=user)
-
-
-# noinspection PyShadowingNames
-@app.route('/posts', methods=['GET', 'POST'])
-def posts():
-    user: User = current_user
-
-    form = AddPostForm()
-    if form.validate_on_submit():
-        post = Post(title=form.title.data, text_content=form.text_content.data, author=user)
-        db.session.add(post)
-        db.session.commit()
-
-    posts: list[Post] = Post.query.join(DeletedPosts, isouter=True).filter(
-        DeletedPosts.soft_deleted_at == None).order_by(Post.created_at).all()
-    return render_template('posts.html', title='All posts', posts=posts, user=user, form=form)
+from .utils import is_safe_url
+from .. import app
+from ..forms import LoginForm, RegisterForm
+from ..repository import db
+from ..repository.model import Session, User
 
 
 # noinspection PyShadowingNames
@@ -109,9 +64,3 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('index'))
-
-
-# noinspection PyUnusedLocal
-@app.errorhandler(404)
-def not_found(error):
-    return render_template('not_found.html', title='404 Not Found'), 404
