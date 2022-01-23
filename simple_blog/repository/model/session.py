@@ -2,8 +2,8 @@ from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
 
-from simple_blog.repository import db
-from simple_blog.repository.model.user import User
+from .user import User
+from .. import db
 
 
 class Session(db.Model):

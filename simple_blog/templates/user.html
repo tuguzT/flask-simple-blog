@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
 
 {% block main %}
-    <h1>User name is {{ user.name }}</h1>
-    <h1>User ID is {{ user.id }}</h1>
+    <h1>Username is {{ user.name }}</h1>
+    <div class="mt-4">
+        <h3 class="mb-3">Posts</h3>
+        {% for post in user.posts %}
+            <div class="mt-2">
+                <h5>{{ post.title }}</h5>
+                <p>{{ post.text_content }}</p>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}
