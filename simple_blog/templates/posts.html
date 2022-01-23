@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    {% if user and user.is_authenticated %}
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.title.label }}<br>
+                {{ form.title(size=100) }}
+                {% for error in form.title.errors %}
+                    <span class="bg-danger">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.text_content.label }}<br>
+                {{ form.text_content(size=100) }}
+                {% for error in form.text_content.errors %}
+                    <span class="bg-danger">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+    {% endif %}
+
+    <h3 class="mb-3 mt-5">All posts</h3>
+    {% set show_author = true %}
+    {% for post in posts %}
+        {% include '_post.html' %}
+    {% endfor %}
+{% endblock %}

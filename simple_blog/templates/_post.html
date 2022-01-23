@@ -1,0 +1,10 @@
+<div class="mt-2">
+    <h5>
+        {% if show_author is sameas true %}
+            {% set author_name = post.author.name %}
+            <a class="fw-bold" href="{{ url_for('user', name=author_name) }}">{{ author_name }}</a>:
+        {% endif %}
+        {{ post.title }}
+    </h5>
+    <p>{{ post.text_content }}</p>
+</div>
