@@ -6,7 +6,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from . import app
 from .forms import LoginForm, RegisterForm, AddPostForm
 from .repository import db
-from .repository.model import Session, User, Post
+from .repository.model import Session, User, Post, DeletedPosts
 
 
 def is_safe_url(target):
@@ -48,7 +48,8 @@ def posts():
         db.session.add(post)
         db.session.commit()
 
-    posts: list[Post] = Post.query.order_by(Post.created_at).all()
+    posts: list[Post] = Post.query.join(DeletedPosts, isouter=True).filter(
+        DeletedPosts.soft_deleted_at == None).order_by(Post.created_at).all()
     return render_template('posts.html', title='All posts', posts=posts, user=user, form=form)
 
 
