@@ -48,7 +48,7 @@ def posts():
         db.session.add(post)
         db.session.commit()
 
-    posts: list[Post] = Post.query.order_by(Post.create_datetime).all()
+    posts: list[Post] = Post.query.order_by(Post.created_at).all()
     return render_template('posts.html', title='All posts', posts=posts, user=user, form=form)
 
 
