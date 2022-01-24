@@ -25,9 +25,5 @@
     {% endif %}
 
     <h3 class="mb-3 mt-5">All posts</h3>
-    {% for post in posts %}
-        {{ post_macros.render_post(post, show_author=true) }}
-    {% else %}
-        <h5>No posts found</h5>
-    {% endfor %}
+    {{ post_macros.render_posts(posts, show_author=true) }}
 {% endblock %}

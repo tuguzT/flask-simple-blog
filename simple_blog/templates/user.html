@@ -6,10 +6,6 @@
     <h1>Username is {{ user.name }}</h1>
     <div class="mt-4">
         <h3 class="mb-3">Posts</h3>
-        {% for post in posts %}
-            {{ post_macros.render_post(post) }}
-        {% else %}
-            <h5>No posts found</h5>
-        {% endfor %}
+        {{ post_macros.render_posts(posts) }}
     </div>
 {% endblock %}

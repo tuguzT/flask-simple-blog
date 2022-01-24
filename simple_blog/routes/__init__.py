@@ -1,5 +1,6 @@
 from .auth import *
 from .basic import *
+from .rest import *
 
 
 # noinspection PyUnusedLocal
