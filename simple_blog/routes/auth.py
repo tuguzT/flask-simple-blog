@@ -37,7 +37,7 @@ def login():
             next_page = url_for('index')
         return redirect(next_page)
 
-    return render_template('login.html', title='Sign in', form=form, user=user)
+    return render_template('login.html', title='Sign in', user=user, form=form)
 
 
 # noinspection PyShadowingNames
@@ -56,7 +56,7 @@ def register():
         db.session.commit()
         return redirect(url_for('login'))
 
-    return render_template('register.html', title='Register', form=form, user=user)
+    return render_template('register.html', title='Register', user=user, form=form)
 
 
 @app.route('/logout')

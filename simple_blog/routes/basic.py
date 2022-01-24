@@ -8,11 +8,9 @@ from ..repository import db
 from ..repository.model import User, Post
 
 
-# noinspection PyShadowingNames
 @app.route('/')
 def index():
-    user: User = current_user
-    return render_template('index.html', user=user)
+    return render_template('index.html', current_user=current_user)
 
 
 # noinspection PyShadowingNames
@@ -29,7 +27,7 @@ def me():
 def user(name: str):
     user: User = User.query.filter_by(name=name).first_or_404(description=f'No user with username {name}')
     posts: list[Post] = posts_not_deleted().filter(Post.author == user).all()
-    return render_template('user.html', title=user.name, user=user, posts=posts)
+    return render_template('user.html', title=user.name, user=user, current_user=current_user, posts=posts)
 
 
 # noinspection PyShadowingNames
@@ -44,4 +42,4 @@ def posts():
         db.session.commit()
 
     posts: list[Post] = posts_not_deleted().order_by(Post.created_at).all()
-    return render_template('posts.html', title='All posts', posts=posts, user=user, form=form)
+    return render_template('posts.html', title='All posts', current_user=user, posts=posts, form=form)
