@@ -14,4 +14,14 @@ def soft_delete_post():
     deleted_post = DeletedPosts(post=post)
     db.session.add(deleted_post)
     db.session.commit()
-    return jsonify({'message': 'Post was soft-deleted'})
+    return jsonify({'message': 'Post was soft-deleted successfully'})
+
+
+@app.route('/api/post/restore', methods=['POST'])
+@login_required
+def restore_post():
+    post_id = request.json['id']
+    post: Post = Post.query.filter_by(id=post_id).first_or_404()
+    DeletedPosts.query.filter_by(post=post).delete()
+    db.session.commit()
+    return jsonify({'message': 'Post was restored successfully'})

@@ -1,7 +1,7 @@
 from flask import render_template
 from flask_login import current_user, login_required
 
-from .utils import posts_not_deleted
+from .utils import posts_not_deleted, posts_deleted
 from .. import app
 from ..forms import AddPostForm
 from ..repository import db
@@ -20,6 +20,14 @@ def me():
     user: User = current_user
     posts: list[Post] = posts_not_deleted().filter(Post.author == user).all()
     return render_template('user.html', title=user.name, user=user, posts=posts)
+
+
+# noinspection PyShadowingNames
+@app.route('/me/deleted_posts')
+def deleted_posts():
+    user: User = current_user
+    deleted_posts: list[Post] = posts_deleted().filter(Post.author == user).all()
+    return render_template('deleted_posts.html', title='Deleted posts', current_user=user, deleted_posts=deleted_posts)
 
 
 # noinspection PyShadowingNames

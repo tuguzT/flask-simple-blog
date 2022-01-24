@@ -10,11 +10,18 @@
             </h5>
             {{ post.text_content }}
         </div>
-        <button type="button"
-                class="btn btn-sm btn-outline-danger"
-                id="post_{{ post.id }}"
-                onclick="delete_post(this.id)">Delete
-        </button>
+        <div>
+            <button type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    id="post_{{ post.id }}"
+                    onclick="soft_delete_post(this.id)">Delete
+            </button>
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    id="post_{{ post.id }}"
+                    onclick="restore_post(this.id)">Restore
+            </button>
+        </div>
     </li>
 {% endmacro %}
 
@@ -30,7 +37,7 @@
                 return fetch(url, init);
             }
 
-            function delete_post(button_id) {
+            function soft_delete_post(button_id) {
                 if (button_id.startsWith('post_')) {
                     const post_id = button_id.substring(5)
                     console.log(post_id)
@@ -38,7 +45,24 @@
                     post_json('{{ url_for('soft_delete_post') }}', object)
                         .then(result => {
                             console.log(result)
-                            window.location.reload()
+                            if (result.ok) {
+                                window.location.reload()
+                            }
+                        })
+                }
+            }
+
+            function restore_post(button_id) {
+                if (button_id.startsWith('post_')) {
+                    const post_id = button_id.substring(5)
+                    console.log(post_id)
+                    const object = {id: post_id}
+                    post_json('{{ url_for('restore_post') }}', object)
+                        .then(result => {
+                            console.log(result)
+                            if (result.ok) {
+                                window.location.reload()
+                            }
                         })
                 }
             }
