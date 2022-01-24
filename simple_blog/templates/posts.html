@@ -1,4 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
+
+{% import 'macros/post.html' as post_macros %}
 
 {% block main %}
     {% if current_user and current_user.is_authenticated %}
@@ -23,8 +25,9 @@
     {% endif %}
 
     <h3 class="mb-3 mt-5">All posts</h3>
-    {% set show_author = true %}
     {% for post in posts %}
-        {% include '_post.html' %}
+        {{ post_macros.render_post(post, show_author=true) }}
+    {% else %}
+        <h5>No posts found</h5>
     {% endfor %}
 {% endblock %}
