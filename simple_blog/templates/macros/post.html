@@ -39,35 +39,39 @@
 
             function soft_delete_post(button_id) {
                 if (button_id.startsWith('post_')) {
-                    const post_id = button_id.substring(5)
-                    console.log(post_id)
-                    const object = {id: post_id}
+                    const post_id = button_id.substring(5);
+                    const object = {id: post_id};
                     post_json('{{ url_for('soft_delete_post') }}', object)
-                        .then(result => {
-                            console.log(result)
-                            if (result.ok) {
-                                window.location.reload()
-                            }
+                        .then(response => {
+                            if (!response.ok) return Promise.reject(response);
+                            return response.json();
                         })
+                        .then(data => {
+                            console.log(data);
+                            window.location.reload();
+                        })
+                        .catch(error => error.json().then(error => console.warn(error)));
                 }
             }
 
             function restore_post(button_id) {
                 if (button_id.startsWith('post_')) {
-                    const post_id = button_id.substring(5)
-                    console.log(post_id)
-                    const object = {id: post_id}
+                    const post_id = button_id.substring(5);
+                    const object = {id: post_id};
                     post_json('{{ url_for('restore_post') }}', object)
-                        .then(result => {
-                            console.log(result)
-                            if (result.ok) {
-                                window.location.reload()
-                            }
+                        .then(response => {
+                            if (!response.ok) return Promise.reject(response);
+                            return response.json();
                         })
+                        .then(data => {
+                            console.log(data);
+                            window.location.reload();
+                        })
+                        .catch(error => error.json().then(error => console.warn(error)));
                 }
             }
         </script>
-        <div class="list-group">
+        <div class="list-group mb-5">
             {% for post in posts %}
                 {{ render_post(post, show_author) }}
             {% endfor %}
