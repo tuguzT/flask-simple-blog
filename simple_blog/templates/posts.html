@@ -25,5 +25,5 @@
     {% endif %}
 
     <h3 class="mb-3 mt-5">All posts</h3>
-    {{ post_macros.render_posts(posts, show_author=true) }}
+    {{ post_macros.render_posts(posts, current_user, show_author=true) }}
 {% endblock %}

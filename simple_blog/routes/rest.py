@@ -37,6 +37,20 @@ def soft_delete_post():
     return jsonify({'message': 'Post was soft-deleted successfully'})
 
 
+@app.route('/api/post/delete', methods=['POST'])
+def delete_post():
+    post_id = request.json['id']
+    post = validate_post(post_id)
+    if post.author != current_user:
+        raise RestError(403, 'Cannot delete post of another user')
+    deleted_post = DeletedPosts.query.filter_by(post=post).one_or_none()
+    if deleted_post is None:
+        raise RestError(403, 'Post was never soft-deleted, cannot delete')
+    db.session.delete(post)
+    db.session.commit()
+    return jsonify({'message': 'Post was deleted successfully'})
+
+
 @app.route('/api/post/restore', methods=['POST'])
 def restore_post():
     post_id = request.json['id']

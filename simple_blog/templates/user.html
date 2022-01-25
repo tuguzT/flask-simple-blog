@@ -6,6 +6,6 @@
     <h1>Username is {{ user.name }}</h1>
     <div class="mt-4">
         <h3 class="mb-3">Posts</h3>
-        {{ post_macros.render_posts(posts) }}
+        {{ post_macros.render_posts(posts, current_user) }}
     </div>
 {% endblock %}

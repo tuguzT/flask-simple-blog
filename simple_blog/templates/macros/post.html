@@ -1,4 +1,4 @@
-{% macro render_post(post, show_author=false) %}
+{% macro render_post(post, current_user, show_author=false) %}
     <li class="list-group-item d-flex justify-content-between align-items-start" id="{{ post.id }}">
         <div class="ms-2 m-1">
             <h5>
@@ -10,51 +10,55 @@
             </h5>
             {{ post.text_content }}
         </div>
-        <div>
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="soft_delete_post('{{ post.id }}')">
-                Delete
-            </button>
-            <button type="button" class="btn btn-sm btn-outline-primary" onclick="restore_post('{{ post.id }}')">
-                Restore
-            </button>
-        </div>
+        {% if current_user.id == post.author.id %}
+            <div>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="soft_delete_post('{{ post.id }}')">
+                    Soft delete
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="delete_post('{{ post.id }}')">
+                    Delete
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="restore_post('{{ post.id }}')">
+                    Restore
+                </button>
+            </div>
+        {% endif %}
     </li>
 {% endmacro %}
 
-{% macro render_posts(posts, show_author=false, no_posts='No posts found') %}
+{% macro render_posts(posts, current_user, show_author=false, no_posts='No posts found') %}
     {% if posts is iterable and posts|length > 0 %}
         <script type="text/javascript">
-            function soft_delete_post(post_id) {
+            function handle_post(url, post_id) {
                 const object = {id: post_id};
-                post_json('{{ url_for('soft_delete_post') }}', object)
-                    .then(response => {
+                post_json(url, object)
+                    .then((response) => {
                         if (!response.ok) return Promise.reject(response);
                         return response.json();
                     })
-                    .then(data => {
+                    .then((data) => {
                         console.log(data);
-                        window.location.reload();
+                        const post = document.getElementById(post_id);
+                        post.remove();
+
+                        const post_list = document.getElementById('post_list');
+                        if (post_list.children.length === 0) {
+                            const div = document.createElement('div');
+                            div.innerHTML = '{{ no_posts }}';
+                            const replacement = div.firstChild;
+                            post_list.parentNode.replaceChild(replacement, post_list);
+                        }
                     })
-                    .catch(error => error.json().then(error => console.warn(error)));
+                    .catch((error) => error.json().then(error => console.warn(error)));
             }
 
-            function restore_post(post_id) {
-                const object = {id: post_id};
-                post_json('{{ url_for('restore_post') }}', object)
-                    .then(response => {
-                        if (!response.ok) return Promise.reject(response);
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log(data);
-                        window.location.reload();
-                    })
-                    .catch(error => error.json().then(error => console.warn(error)));
-            }
+            const soft_delete_post = (post_id) => handle_post('{{ url_for('soft_delete_post') }}', post_id);
+            const delete_post = (post_id) => handle_post('{{ url_for('delete_post') }}', post_id);
+            const restore_post = (post_id) => handle_post('{{ url_for('restore_post') }}', post_id);
         </script>
-        <div class="list-group mb-5">
+        <div class="list-group mb-5" id="post_list">
             {% for post in posts %}
-                {{ render_post(post, show_author) }}
+                {{ render_post(post, current_user, show_author) }}
             {% endfor %}
         </div>
     {% else %}
