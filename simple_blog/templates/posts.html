@@ -3,27 +3,33 @@
 {% import 'macros/post.html' as post_macros %}
 
 {% block main %}
+    <h3 class="mb-3 mt-5">All posts</h3>
     {% if current_user and current_user.is_authenticated %}
-        <form action="" method="post" novalidate>
+        <form id="add_post_form" action="" method="post" class="container-fluid rounded border p-4 mb-4" novalidate>
             {{ form.hidden_tag() }}
-            <p>
-                {{ form.title.label }}<br>
-                {{ form.title(size=100) }}
-                {% for error in form.title.errors %}
-                    <span class="bg-danger">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-            <p>
-                {{ form.text_content.label }}<br>
-                {{ form.text_content(size=100) }}
-                {% for error in form.text_content.errors %}
-                    <span class="bg-danger">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-            <p>{{ form.submit() }}</p>
+            <h4>Create new post</h4>
+            <div class="mb-3">
+                <label for="{{ form.title.id }}" class="form-label">{{ form.title.label.text }}</label>
+                {% set class = 'form-control' + (' is-invalid' if form.title.errors|length > 0 else '') %}
+                {{ form.title(class=class) }}
+                {% if form.title.errors|length > 0 %}
+                    <div class="invalid-feedback">
+                        {% for error in form.title.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.text_content.id }}" class="form-label">{{ form.text_content.label.text }}</label>
+                {% set class = 'form-control' + (' is-invalid' if form.text_content.errors|length > 0 else '') %}
+                {{ form.text_content(class=class) }}
+                {% if form.text_content.errors|length > 0 %}
+                    <div class="invalid-feedback">
+                        {% for error in form.text_content.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            {{ form.submit(class='btn btn-primary') }}
         </form>
     {% endif %}
-
-    <h3 class="mb-3 mt-5">All posts</h3>
     {{ post_macros.render_posts(posts, current_user, show_author=true) }}
 {% endblock %}
