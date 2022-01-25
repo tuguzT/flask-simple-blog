@@ -1,11 +1,12 @@
-from flask import request, jsonify
-from flask_login import current_user
+from flask import request, jsonify, url_for
+from flask_login import current_user, login_user
 
 from .errors import ApiError, FormValidationError
+from .utils import is_safe_url
 from .. import app
-from ..forms import AddPostForm
+from ..forms import AddPostForm, LoginForm, RegisterForm
 from ..repository import db
-from ..repository.model import Post, DeletedPosts, User
+from ..repository.model import Post, DeletedPosts, User, Session
 
 
 def validate_current_user() -> User:
@@ -87,3 +88,49 @@ def add_post_form():
         'message': 'Post was created successfully',
         'id': post.id,
     })
+
+
+@app.route('/api/login/form', methods=['POST'])
+def login_form():
+    form = LoginForm()
+    if not form.is_submitted():
+        raise ApiError(403, 'Login form was not submitted')
+    if not form.validate():
+        raise FormValidationError(form, 403, 'Login form contains errors after validation')
+    user: User = User.query.filter_by(name=form.username.data).one()
+
+    session: Session = Session.query.with_parent(user).one_or_none()
+    if session is None:
+        session = Session(user=user)
+        db.session.add(session)
+        db.session.commit()
+    login_user(user, remember=form.remember_me.data)
+
+    next_page = request.args.get('next')
+    if not next_page or not is_safe_url(next_page):
+        next_page = url_for('index')
+    data = {
+        'url': next_page,
+        'message': 'User logged in successfully',
+    }
+    return jsonify(data)
+
+
+@app.route('/api/register/form', methods=['POST'])
+def register_form():
+    form = RegisterForm()
+    if not form.is_submitted():
+        raise ApiError(403, 'Register form was not submitted')
+    if not form.validate():
+        raise FormValidationError(form, 403, 'Register form contains errors after validation')
+
+    # noinspection PyArgumentList
+    user = User(name=form.username.data)
+    user.set_password(form.password.data)
+    db.session.add(user)
+    db.session.commit()
+    data = {
+        'url': url_for('login'),
+        'message': 'User registered successfully',
+    }
+    return jsonify(data)

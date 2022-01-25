@@ -21,4 +21,43 @@
     <div class="mt-4">
         New user? <a href="{{ url_for('register') }}">Register</a>
     </div>
+    <script type="text/javascript">
+        const csrf_token = '{{ form.csrf_token }}';
+        const form = document.getElementById('login_form');
+        const fields = form.querySelectorAll('.form-control');
+
+        function submit() {
+            const form_data = new FormData(form);
+            post_form('{{ url_for('login_form') }}', form_data, csrf_token)
+                .then(response => {
+                    if (!response.ok) return Promise.reject(response);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data);
+                    fields.forEach(field => field.className = 'form-control is-valid');
+                    alert(data.message);
+                    {# TODO: add timeout to show message for the user #}
+                    window.location.replace(data.url);
+                })
+                .catch(error => error.json().then(error => {
+                    console.warn(error);
+                    fields.forEach(field => field.className = 'form-control is-valid');
+
+                    for (const id in error.errors) {
+                        const text = error.errors[id];
+                        const field = document.getElementById(id);
+                        field.className = 'form-control is-invalid';
+
+                        const feedback = field.parentElement.querySelector('div.invalid-feedback');
+                        feedback.innerText = text;
+                    }
+                }));
+        }
+
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+            submit();
+        });
+    </script>
 {% endblock %}
