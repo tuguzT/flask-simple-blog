@@ -18,7 +18,8 @@ def index():
 @login_required
 def me():
     user: User = current_user
-    posts: list[Post] = posts_not_deleted().filter(Post.author == user).all()
+    # noinspection PyUnresolvedReferences
+    posts: list[Post] = posts_not_deleted().filter(Post.author == user).order_by(Post.created_at.desc()).all()
     return render_template('user.html', title=user.name, user=user, posts=posts)
 
 
@@ -26,7 +27,8 @@ def me():
 @app.route('/me/deleted_posts')
 def deleted_posts():
     user: User = current_user
-    deleted_posts: list[Post] = posts_deleted().filter(Post.author == user).all()
+    # noinspection PyUnresolvedReferences
+    deleted_posts: list[Post] = posts_deleted().filter(Post.author == user).order_by(Post.created_at.desc()).all()
     return render_template('deleted_posts.html', title='Deleted posts', current_user=user, deleted_posts=deleted_posts)
 
 
@@ -34,7 +36,8 @@ def deleted_posts():
 @app.route('/user/<name>')
 def user(name: str):
     user: User = User.query.filter_by(name=name).first_or_404(description=f'No user with username {name}')
-    posts: list[Post] = posts_not_deleted().filter(Post.author == user).all()
+    # noinspection PyUnresolvedReferences
+    posts: list[Post] = posts_not_deleted().filter(Post.author == user).order_by(Post.created_at.desc()).all()
     return render_template('user.html', title=user.name, user=user, current_user=current_user, posts=posts)
 
 
@@ -49,5 +52,6 @@ def posts():
         db.session.add(post)
         db.session.commit()
 
-    posts: list[Post] = posts_not_deleted().order_by(Post.created_at).all()
+    # noinspection PyUnresolvedReferences
+    posts: list[Post] = posts_not_deleted().order_by(Post.created_at.desc()).all()
     return render_template('posts.html', title='All posts', current_user=user, posts=posts, form=form)

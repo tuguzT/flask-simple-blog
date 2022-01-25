@@ -2,11 +2,9 @@
     <label for="{{ field.id }}" class="form-label">{{ field.label.text }}</label>
     {% set class = 'form-control' ~ (' is-invalid' if field.errors|length > 0) %}
     {{ field(class=class) }}
-    {% if field.errors|length > 0 %}
-        <div class="invalid-feedback">
-            {% for error in field.errors %}{{ error }}{% endfor %}
-        </div>
-    {% endif %}
+    <div class="invalid-feedback">
+        {% for error in field.errors %}{{ error }}{% endfor %}
+    </div>
 {% endmacro %}
 
 {% macro render_form_sumbit(submit) %}

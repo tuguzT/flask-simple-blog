@@ -7,6 +7,43 @@
     <h3 class="mb-3 mt-5">All posts</h3>
     {% if current_user and current_user.is_authenticated %}
         {{ forms_macros.render_create_post_form(form) }}
+        <script type="text/javascript">
+            const csrf_token = '{{ form.csrf_token }}';
+            const form = document.getElementById('add_post_form');
+            const fields = form.querySelectorAll('.form-control');
+
+            function submit() {
+                const form_data = new FormData(form);
+                post_form('{{ url_for('add_post_form') }}', form_data, csrf_token)
+                    .then(response => {
+                        if (!response.ok) return Promise.reject(response);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        fields.forEach(field => field.className = 'form-control is-valid');
+                        alert(data.message);
+                    })
+                    .catch(error => error.json().then(error => {
+                        console.warn(error);
+                        fields.forEach(field => field.className = 'form-control is-valid');
+
+                        for (const id in error.errors) {
+                            const text = error.errors[id];
+                            const field = document.getElementById(id);
+                            field.className = 'form-control is-invalid';
+
+                            const feedback = field.parentElement.querySelector('div.invalid-feedback');
+                            feedback.innerText = text;
+                        }
+                    }));
+            }
+
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                submit();
+            });
+        </script>
     {% endif %}
     {{ post_macros.render_posts(posts, current_user, show_author=true) }}
 {% endblock %}
