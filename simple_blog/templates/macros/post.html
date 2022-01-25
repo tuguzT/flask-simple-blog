@@ -1,4 +1,4 @@
-{% macro render_post(post, current_user, show_author=false) %}
+{% macro render_post(post, current_user, button_tags=[], show_author=false) %}
     <li class="list-group-item d-flex justify-content-between align-items-start" id="{{ post.id }}">
         <div class="ms-2 m-1">
             <h5>
@@ -12,21 +12,29 @@
         </div>
         {% if current_user.id == post.author.id %}
             <div>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="soft_delete_post('{{ post.id }}')">
-                    Soft delete
-                </button>
-                <button type="button" class="btn btn-sm btn-danger" onclick="delete_post('{{ post.id }}')">
-                    Delete
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-primary" onclick="restore_post('{{ post.id }}')">
-                    Restore
-                </button>
+                {% if 'soft_delete' in button_tags %}
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                            onclick="soft_delete_post('{{ post.id }}')">
+                        Delete
+                    </button>
+                {% endif %}
+                {% if 'delete' in button_tags %}
+                    <button type="button" class="btn btn-sm btn-danger" onclick="delete_post('{{ post.id }}')">
+                        Delete
+                    </button>
+                {% endif %}
+                {% if 'restore' in button_tags %}
+                    <button type="button" class="btn btn-sm btn-outline-primary"
+                            onclick="restore_post('{{ post.id }}')">
+                        Restore
+                    </button>
+                {% endif %}
             </div>
         {% endif %}
     </li>
 {% endmacro %}
 
-{% macro render_posts(posts, current_user, show_author=false, no_posts='No posts found') %}
+{% macro render_posts(posts, current_user, button_tags=[], show_author=false, no_posts='No posts found') %}
     {% if posts is iterable and posts|length > 0 %}
         <script type="text/javascript">
             function handle_post(url, post_id) {
@@ -58,7 +66,7 @@
         </script>
         <div class="list-group mb-5" id="post_list">
             {% for post in posts %}
-                {{ render_post(post, current_user, show_author) }}
+                {{ render_post(post, current_user, button_tags, show_author) }}
             {% endfor %}
         </div>
     {% else %}
