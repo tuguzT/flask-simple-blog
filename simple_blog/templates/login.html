@@ -1,34 +1,22 @@
 {% extends 'base/base.html' %}
 
+{% import 'macros/forms.html' as forms_macros %}
+
 {% block main %}
     <h1 class="mt-5">Log in</h1>
     <form id="login_form" action="" method="post" novalidate>
         {{ form.hidden_tag() }}
         <div class="mb-3">
-            <label for="{{ form.username.id }}" class="form-label">{{ form.username.label.text }}</label>
-            {% set class = 'form-control' + (' is-invalid' if form.username.errors|length > 0 else '') %}
-            {{ form.username(class=class) }}
-            {% if form.username.errors|length > 0 %}
-                <div class="invalid-feedback">
-                    {% for error in form.username.errors %}{{ error }}{% endfor %}
-                </div>
-            {% endif %}
+            {{ forms_macros.render_form_textfield(form.username) }}
         </div>
         <div class="mb-3">
-            <label for="{{ form.password.id }}" class="form-label">{{ form.password.label.text }}</label>
-            {% set class = 'form-control' + (' is-invalid' if form.password.errors|length > 0 else '') %}
-            {{ form.password(class=class) }}
-            {% if form.password.errors|length > 0 %}
-                <div class="invalid-feedback">
-                    {% for error in form.password.errors %}{{ error }}{% endfor %}
-                </div>
-            {% endif %}
+            {{ forms_macros.render_form_textfield(form.password) }}
         </div>
         <div class="mb-3 form-check">
             {{ form.remember_me(class='form-check-input') }}
             <label for="{{ form.remember_me.id }}" class="form-check-label">{{ form.remember_me.label.text }}</label>
         </div>
-        {{ form.submit(class='btn btn-primary') }}
+        {{ forms_macros.render_form_sumbit(form.submit) }}
     </form>
     <div class="mt-4">
         New user? <a href="{{ url_for('register') }}">Register</a>

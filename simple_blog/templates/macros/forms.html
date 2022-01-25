@@ -1,0 +1,28 @@
+{% macro render_form_textfield(field) %}
+    <label for="{{ field.id }}" class="form-label">{{ field.label.text }}</label>
+    {% set class = 'form-control' ~ (' is-invalid' if field.errors|length > 0) %}
+    {{ field(class=class) }}
+    {% if field.errors|length > 0 %}
+        <div class="invalid-feedback">
+            {% for error in field.errors %}{{ error }}{% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_form_sumbit(submit) %}
+    {{ submit(class='btn btn-primary') }}
+{% endmacro %}
+
+{% macro render_create_post_form(form) %}
+    <form id="add_post_form" action="" method="post" class="container-fluid rounded border p-4 mb-4" novalidate>
+        {{ form.hidden_tag() }}
+        <h4>Create new post</h4>
+        <div class="mb-3">
+            {{ render_form_textfield(form.title) }}
+        </div>
+        <div class="mb-3">
+            {{ render_form_textfield(form.text_content) }}
+        </div>
+        {{ render_form_sumbit(form.submit) }}
+    </form>
+{% endmacro %}
