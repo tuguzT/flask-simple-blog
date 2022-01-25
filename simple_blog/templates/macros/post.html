@@ -1,5 +1,5 @@
 {% macro render_post(post, show_author=false) %}
-    <li class="list-group-item d-flex justify-content-between align-items-start">
+    <li class="list-group-item d-flex justify-content-between align-items-start" id="{{ post.id }}">
         <div class="ms-2 m-1">
             <h5>
                 {% if show_author %}
@@ -11,15 +11,11 @@
             {{ post.text_content }}
         </div>
         <div>
-            <button type="button"
-                    class="btn btn-sm btn-outline-danger"
-                    id="post_{{ post.id }}"
-                    onclick="soft_delete_post(this.id)">Delete
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="soft_delete_post('{{ post.id }}')">
+                Delete
             </button>
-            <button type="button"
-                    class="btn btn-sm btn-outline-primary"
-                    id="post_{{ post.id }}"
-                    onclick="restore_post(this.id)">Restore
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="restore_post('{{ post.id }}')">
+                Restore
             </button>
         </div>
     </li>
@@ -28,47 +24,32 @@
 {% macro render_posts(posts, show_author=false, no_posts='No posts found') %}
     {% if posts is iterable and posts|length > 0 %}
         <script type="text/javascript">
-            function post_json(url, json) {
-                const init = {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(json),
-                };
-                return fetch(url, init);
+            function soft_delete_post(post_id) {
+                const object = {id: post_id};
+                post_json('{{ url_for('soft_delete_post') }}', object)
+                    .then(response => {
+                        if (!response.ok) return Promise.reject(response);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        window.location.reload();
+                    })
+                    .catch(error => error.json().then(error => console.warn(error)));
             }
 
-            function soft_delete_post(button_id) {
-                if (button_id.startsWith('post_')) {
-                    const post_id = button_id.substring(5);
-                    const object = {id: post_id};
-                    post_json('{{ url_for('soft_delete_post') }}', object)
-                        .then(response => {
-                            if (!response.ok) return Promise.reject(response);
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log(data);
-                            window.location.reload();
-                        })
-                        .catch(error => error.json().then(error => console.warn(error)));
-                }
-            }
-
-            function restore_post(button_id) {
-                if (button_id.startsWith('post_')) {
-                    const post_id = button_id.substring(5);
-                    const object = {id: post_id};
-                    post_json('{{ url_for('restore_post') }}', object)
-                        .then(response => {
-                            if (!response.ok) return Promise.reject(response);
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log(data);
-                            window.location.reload();
-                        })
-                        .catch(error => error.json().then(error => console.warn(error)));
-                }
+            function restore_post(post_id) {
+                const object = {id: post_id};
+                post_json('{{ url_for('restore_post') }}', object)
+                    .then(response => {
+                        if (!response.ok) return Promise.reject(response);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        window.location.reload();
+                    })
+                    .catch(error => error.json().then(error => console.warn(error)));
             }
         </script>
         <div class="list-group mb-5">

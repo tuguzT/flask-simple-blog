@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from flask_login import login_required, current_user
+from flask_login import current_user
 
 from .errors import RestError
 from .. import app
@@ -7,15 +7,26 @@ from ..repository import db
 from ..repository.model import Post, DeletedPosts, User
 
 
-@app.route('/api/post/soft_delete', methods=['POST'])
-@login_required
-def soft_delete_post():
+def validate_current_user() -> User:
     user: User = current_user
-    post_id = request.json['id']
+    if not user.is_authenticated:
+        raise RestError(401, 'User was not authenticated')
+    return user
+
+
+def validate_post(post_id: str) -> Post:
+    validate_current_user()
     post: Post = Post.query.filter_by(id=post_id).one_or_none()
     if post is None:
-        raise RestError(404, 'No user exists by provided id')
-    if post.author != user:
+        raise RestError(404, 'No post exists by provided ID')
+    return post
+
+
+@app.route('/api/post/soft_delete', methods=['POST'])
+def soft_delete_post():
+    post_id = request.json['id']
+    post = validate_post(post_id)
+    if post.author != current_user:
         raise RestError(403, 'Cannot soft-delete post of another user')
     deleted_post = DeletedPosts.query.filter_by(post=post).one_or_none()
     if deleted_post is not None:
@@ -27,17 +38,14 @@ def soft_delete_post():
 
 
 @app.route('/api/post/restore', methods=['POST'])
-@login_required
 def restore_post():
-    user: User = current_user
     post_id = request.json['id']
-    post: Post = Post.query.filter_by(id=post_id).one_or_none()
-    if post is None:
-        raise RestError(404, 'No user exists by provided id')
-    if post.author != user:
+    post = validate_post(post_id)
+    if post.author != current_user:
         raise RestError(403, 'Cannot restore post of another user')
     count: int = DeletedPosts.query.filter_by(post=post).delete()
     if count == 0:
+        db.session.rollback()
         raise RestError(403, 'Post was not soft-deleted, cannot restore')
     db.session.commit()
     return jsonify({'message': 'Post was restored successfully'})
