@@ -16,9 +16,17 @@ def validate_current_user() -> User:
     return user
 
 
+def validate_user(user_id: str) -> User:
+    validate_current_user()
+    user: User | None = User.query.get(user_id)
+    if user is None:
+        raise ApiError(404, 'No user exists by provided ID')
+    return user
+
+
 def validate_post(post_id: str) -> Post:
     validate_current_user()
-    post: Post = Post.query.filter_by(id=post_id).one_or_none()
+    post: Post | None = Post.query.filter_by(id=post_id).one_or_none()
     if post is None:
         raise ApiError(404, 'No post exists by provided ID')
     return post
@@ -70,7 +78,24 @@ def restore_post():
 @app.route('/api/post/<post_id>')
 def get_post(post_id: str):
     post = validate_post(post_id)
-    return jsonify(post)
+    data = {
+        'id': post.id,
+        'created_at': post.created_at,
+        'title': post.title,
+        'text_content': post.text_content,
+        'author_id': post.author_id,
+    }
+    return jsonify(data)
+
+
+@app.route('/api/user/<user_id>')
+def get_user(user_id: str):
+    user = validate_user(user_id)
+    data = {
+        'id': user.id,
+        'name': user.name,
+    }
+    return jsonify(data)
 
 
 @app.route('/api/post/form/add', methods=['POST'])

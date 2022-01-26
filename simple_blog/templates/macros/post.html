@@ -1,14 +1,14 @@
 {% macro render_post(post, current_user, button_tags=[], show_author=false) %}
     <li class="list-group-item d-flex justify-content-between align-items-start" id="{{ post.id }}">
-        <div class="ms-2 m-1">
-            <h5>
+        <div class="ms-2 m-1 w-100">
+            <h5 class="d-inline-block w-100" style="overflow-wrap: break-word;">
                 {% if show_author %}
                     {% set author_name = post.author.name %}
                     <a class="fw-bold" href="{{ url_for('user', name=author_name) }}">{{ author_name }}</a>:
                 {% endif %}
                 {{ post.title }}
             </h5>
-            {{ post.text_content }}
+            <span class="d-inline-block w-100" style="overflow-wrap: break-word;">{{ post.text_content }}</span>
         </div>
         {% if current_user.id == post.author.id %}
             <div>
