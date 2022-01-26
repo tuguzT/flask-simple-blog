@@ -4,26 +4,28 @@
 {% import 'macros/forms.html' as forms_macros %}
 
 {% block main %}
-    <h3 class="mb-3 mt-5">All posts</h3>
-    {% if current_user and current_user.is_authenticated %}
-        {{ forms_macros.render_create_post_form(form) }}
-        <script src="{{ url_for('static', filename='js/form.js') }}"></script>
-        <script type="text/javascript">
-            const csrf_token = '{{ form.csrf_token }}';
-            const form = document.getElementById('add_post_form');
+    <div class="container">
+        <h3 class="mb-3 mt-5">All posts</h3>
+        {% if current_user and current_user.is_authenticated %}
+            {{ forms_macros.render_create_post_form(form) }}
+            <script src="{{ url_for('static', filename='js/form.js') }}"></script>
+            <script type="text/javascript">
+                const csrf_token = '{{ form.csrf_token }}';
+                const form = document.getElementById('add_post_form');
 
-            form.addEventListener('submit', event => {
-                event.preventDefault();
-                submit_create_post_form(
-                    '{{ url_for('add_post_form') }}',
-                    '{{ url_for('get_post', post_id='REPLACE') }}',
-                    '{{ url_for('get_user', user_id='REPLACE') }}',
-                    '{{ url_for('user', name='REPLACE') }}',
-                    csrf_token,
-                    form,
-                );
-            });
-        </script>
-    {% endif %}
-    {{ post_macros.render_posts(posts, current_user, show_author=true) }}
+                form.addEventListener('submit', event => {
+                    event.preventDefault();
+                    submit_create_post_form(
+                        '{{ url_for('add_post_form') }}',
+                        '{{ url_for('get_post', post_id='REPLACE') }}',
+                        '{{ url_for('get_user', user_id='REPLACE') }}',
+                        '{{ url_for('user', name='REPLACE') }}',
+                        csrf_token,
+                        form,
+                    );
+                });
+            </script>
+        {% endif %}
+        {{ post_macros.render_posts(posts, current_user, show_author=true) }}
+    </div>
 {% endblock %}
