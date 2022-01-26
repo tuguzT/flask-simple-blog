@@ -7,71 +7,21 @@
     <h3 class="mb-3 mt-5">All posts</h3>
     {% if current_user and current_user.is_authenticated %}
         {{ forms_macros.render_create_post_form(form) }}
+        <script src="{{ url_for('static', filename='js/form.js') }}"></script>
         <script type="text/javascript">
             const csrf_token = '{{ form.csrf_token }}';
             const form = document.getElementById('add_post_form');
-            const fields = form.querySelectorAll('.form-control');
-
-            function submit() {
-                const form_data = new FormData(form);
-                post_form('{{ url_for('add_post_form') }}', form_data, csrf_token)
-                    .then(response => {
-                        if (!response.ok) return Promise.reject(response);
-                        return response.json();
-                    })
-                    .then(data => {
-                        fields.forEach(field => field.className = 'form-control is-valid');
-
-                        const post_id = data.id;
-                        const url = '{{ url_for('get_post', post_id='REPLACE') }}'.replace('REPLACE', post_id);
-                        fetch(url).then(response => response.json()).then(post => {
-                            const title = post.title;
-                            const text_content = post['text_content'];
-                            const author_id = post['author_id'];
-                            const url = '{{ url_for('get_user', user_id='REPLACE') }}'.replace('REPLACE', author_id);
-                            fetch(url).then(response => response.json()).then(user => {
-                                const username = user.name;
-                                const post_list = document.getElementById('post_list');
-
-                                const div = document.createElement('div');
-                                const user_url = '{{ url_for('user', name='REPLACE') }}'.replace('REPLACE', username);
-                                div.innerHTML = `
-                                    <li class="list-group-item d-flex justify-content-between align-items-start"
-                                        id="${post_id}">
-                                        <div class="ms-2 m-1 w-100">
-                                            <h5 class="d-inline-block w-100" style="overflow-wrap: break-word;">
-                                                <a class="fw-bold" href="${user_url}">${username}</a>: ${title}
-                                            </h5>
-                                            <span class="d-inline-block w-100" style="overflow-wrap: break-word">
-                                                ${text_content}
-                                            </span>
-                                        </div>
-                                    </li>
-                                `.trim();
-                                const post = div.firstChild;
-                                const first_post = post_list.querySelector('li');
-                                post_list.insertBefore(post, first_post);
-                            });
-                        });
-                    })
-                    .catch(error => error.json().then(error => {
-                        console.warn(error);
-                        fields.forEach(field => field.className = 'form-control is-valid');
-
-                        for (const id in error.errors) {
-                            const text = error.errors[id].join('\n');
-                            const field = document.getElementById(id);
-                            field.className = 'form-control is-invalid';
-
-                            const feedback = field.parentElement.querySelector('div.invalid-feedback');
-                            feedback.innerText = text;
-                        }
-                    }));
-            }
 
             form.addEventListener('submit', event => {
                 event.preventDefault();
-                submit();
+                submit_create_post_form(
+                    '{{ url_for('add_post_form') }}',
+                    '{{ url_for('get_post', post_id='REPLACE') }}',
+                    '{{ url_for('get_user', user_id='REPLACE') }}',
+                    '{{ url_for('user', name='REPLACE') }}',
+                    csrf_token,
+                    form,
+                );
             });
         </script>
     {% endif %}

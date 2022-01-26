@@ -5,4 +5,5 @@
 {% block main %}
     <h3 class="mb-3 mt-5">Deleted posts</h3>
     {{ post_macros.render_posts(deleted_posts, current_user, ['delete', 'restore']) }}
+    <script src="{{ url_for('static', filename='js/post.js') }}"></script>
 {% endblock %}

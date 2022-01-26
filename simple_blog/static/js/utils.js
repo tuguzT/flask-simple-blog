@@ -1,3 +1,5 @@
+const REPLACE = 'REPLACE';
+
 function post_json(url, json) {
     const init = {
         method: 'POST',
