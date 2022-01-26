@@ -37,9 +37,6 @@
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{{ url_for('me') }}">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for('logout') }}">Log out</a>
-                        </li>
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{{ url_for('login') }}">Log in</a>
@@ -48,20 +45,29 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{{ url_for('posts') }}">All posts</a>
                     </li>
+                    {% if current_user and current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{{ url_for('deleted_posts') }}">
+                                My deleted posts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{{ url_for('logout') }}">Log out</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
 </header>
 <main class="flex-shrink-0">
-    <div class="container">
-        {% block main required %}
-        {% endblock %}
-    </div>
+    {% block main required %}
+    {% endblock %}
 </main>
 <footer class="d-block mt-auto py-3 border-top bg-light">
-    <div class="container">
-        <span class="text-muted">Some footer content</span>
+    <div class="d-flex container justify-content-between align-items-center">
+        <span class="text-muted">© 2022 <a href="https://github.com/tuguzT">tuguzT</a></span>
+        <a href="mailto:timurka.tugushev@gmail.com">timurka.tugushev@gmail.com</a>
     </div>
 </footer>
 </body>

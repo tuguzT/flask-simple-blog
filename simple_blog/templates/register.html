@@ -3,31 +3,33 @@
 {% import 'macros/forms.html' as forms_macros %}
 
 {% block main %}
-    <h1 class="mt-5">Register</h1>
-    <form id="register_form" action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
-        <div class="mb-3">
-            {{ forms_macros.render_form_textfield(form.username) }}
+    <div class="container">
+        <h1 class="mt-5">Register</h1>
+        <form id="register_form" action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                {{ forms_macros.render_form_textfield(form.username) }}
+            </div>
+            <div class="mb-3">
+                {{ forms_macros.render_form_textfield(form.password) }}
+            </div>
+            <div class="mb-3">
+                {{ forms_macros.render_form_textfield(form.repeat_password) }}
+            </div>
+            {{ forms_macros.render_form_sumbit(form.submit) }}
+        </form>
+        <div class="mt-4">
+            Have account? <a href="{{ url_for('login') }}">Log in</a>
         </div>
-        <div class="mb-3">
-            {{ forms_macros.render_form_textfield(form.password) }}
-        </div>
-        <div class="mb-3">
-            {{ forms_macros.render_form_textfield(form.repeat_password) }}
-        </div>
-        {{ forms_macros.render_form_sumbit(form.submit) }}
-    </form>
-    <div class="mt-4">
-        Have account? <a href="{{ url_for('login') }}">Log in</a>
-    </div>
-    <script src="{{ url_for('static', filename='js/form.js') }}"></script>
-    <script type="text/javascript">
-        const csrf_token = '{{ form.csrf_token }}';
-        const form = document.getElementById('register_form');
+        <script src="{{ url_for('static', filename='js/form.js') }}"></script>
+        <script type="text/javascript">
+            const csrf_token = '{{ form.csrf_token }}';
+            const form = document.getElementById('register_form');
 
-        form.addEventListener('submit', event => {
-            event.preventDefault();
-            submit_auth_form('{{ url_for('register_form') }}', csrf_token, form);
-        });
-    </script>
+            form.addEventListener('submit', event => {
+                event.preventDefault();
+                submit_auth_form('{{ url_for('register_form') }}', csrf_token, form);
+            });
+        </script>
+    </div>
 {% endblock %}
