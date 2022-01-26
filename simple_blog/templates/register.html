@@ -44,7 +44,7 @@
                     fields.forEach(field => field.className = 'form-control is-valid');
 
                     for (const id in error.errors) {
-                        const text = error.errors[id];
+                        const text = error.errors[id].join('\n');
                         const field = document.getElementById(id);
                         field.className = 'form-control is-invalid';
 
